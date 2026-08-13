@@ -1,0 +1,34 @@
+{
+  "collections": [
+    {
+      "name": "users",
+      "description": "Stores user profiles",
+      "fields": [
+        { "name": "email", "type": "string" },
+        { "name": "displayName", "type": "string" },
+        { "name": "createdAt", "type": "timestamp" }
+      ]
+    },
+    {
+      "name": "queries",
+      "description": "Stores AI queries made by users",
+      "fields": [
+        { "name": "userId", "type": "string", "description": "Reference to users collection" },
+        { "name": "prompt", "type": "string" },
+        { "name": "response", "type": "string" },
+        { "name": "createdAt", "type": "timestamp" }
+      ]
+    },
+    {
+      "name": "files",
+      "description": "Stores files created by the user",
+      "fields": [
+        { "name": "userId", "type": "string", "description": "Reference to users collection" },
+        { "name": "path", "type": "string" },
+        { "name": "content", "type": "string" },
+        { "name": "createdAt", "type": "timestamp" },
+        { "name": "updatedAt", "type": "timestamp" }
+      ]
+    }
+  ]
+}
