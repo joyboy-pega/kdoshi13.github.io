@@ -66,6 +66,13 @@ export const Terminal: React.FC<TerminalProps> = ({
   // Only auto-scroll after a user-submitted command, never on initial render
   const shouldScroll = useRef(false);
 
+  // Ensure page always starts at the top on mount without jumping
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // Focus without triggering viewport scroll
+    inputRef.current?.focus({ preventScroll: true });
+  }, []);
+
   useEffect(() => {
     if (shouldScroll.current) {
       bottomRef.current?.scrollIntoView({ behavior: 'auto' });
@@ -73,7 +80,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     }
   }, [history]);
 
-  const handleTerminalClick = () => inputRef.current?.focus();
+  const handleTerminalClick = () => inputRef.current?.focus({ preventScroll: true });
 
   const runCmd = async (cmd: string) => {
     if (!cmd.trim()) return;
@@ -224,7 +231,6 @@ export const Terminal: React.FC<TerminalProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            autoFocus
             spellCheck={false}
             autoComplete="off"
           />
