@@ -2,17 +2,23 @@ import React, { useState, useRef, useEffect } from 'react';
 import { HistoryItem, VFSNode } from '../../types';
 import { StarshipPrompt } from './StarshipPrompt';
 import { BootBanner } from './BootBanner';
+import { CmdWhoami } from './commands/CmdWhoami';
+import { CmdSummary } from './commands/CmdSummary';
+import { CmdExperience } from './commands/CmdExperience';
+import { CmdProjects } from './commands/CmdProjects';
+import { CmdSkills } from './commands/CmdSkills';
+import { CmdEducation } from './commands/CmdEducation';
+import { CmdContact } from './commands/CmdContact';
 import { executeCommand, resolvePath, getNode } from '../../services/vfs';
 
 interface TerminalProps {
   vfs: Record<string, VFSNode>;
   setVfs: React.Dispatch<React.SetStateAction<Record<string, VFSNode>>>;
-  currentUser: any;
   onLaunchGame: () => void;
 }
 
 export const Terminal: React.FC<TerminalProps> = ({
-  vfs, setVfs, currentUser, onLaunchGame,
+  vfs, setVfs, onLaunchGame,
 }) => {
   const [cwd, setCwd] = useState('/home/guest/portfolio');
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
@@ -39,6 +45,20 @@ export const Terminal: React.FC<TerminalProps> = ({
         </div>
       ),
     },
+    { id: 1,  type: 'input',  content: 'whoami',           cwd: '/home/guest/portfolio' },
+    { id: 2,  type: 'output', content: <CmdWhoami /> },
+    { id: 3,  type: 'input',  content: 'summary',          cwd: '/home/guest/portfolio' },
+    { id: 4,  type: 'output', content: <CmdSummary /> },
+    { id: 5,  type: 'input',  content: './experience.sh',  cwd: '/home/guest/portfolio' },
+    { id: 6,  type: 'output', content: <CmdExperience /> },
+    { id: 7,  type: 'input',  content: './projects.sh',    cwd: '/home/guest/portfolio' },
+    { id: 8,  type: 'output', content: <CmdProjects /> },
+    { id: 9,  type: 'input',  content: 'cat skills.yml',   cwd: '/home/guest/portfolio' },
+    { id: 10, type: 'output', content: <CmdSkills /> },
+    { id: 11, type: 'input',  content: './education.sh',   cwd: '/home/guest/portfolio' },
+    { id: 12, type: 'output', content: <CmdEducation /> },
+    { id: 13, type: 'input',  content: 'cat contact.json', cwd: '/home/guest/portfolio' },
+    { id: 14, type: 'output', content: <CmdContact /> },
   ]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -76,7 +96,7 @@ export const Terminal: React.FC<TerminalProps> = ({
       },
     ]);
 
-    const output = await executeCommand({ cmdStr: cmd, cwd, setCwd, vfs, setVfs, cmdHistory, currentUser, onLaunchGame });
+    const output = await executeCommand({ cmdStr: cmd, cwd, setCwd, vfs, setVfs, cmdHistory, onLaunchGame });
 
     setHistory(prev => {
       const filtered = prev.filter(h => h.id !== loadingId);
@@ -132,9 +152,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     'help', 'summary', 'experience', 'projects', 'skills', 'education', 'contact', 'game', 'clear',
   ];
 
-  const userLabel = currentUser
-    ? (currentUser.displayName?.toLowerCase().replace(/\s+/g, '') || 'user')
-    : 'guest';
+  const userLabel = 'guest';
 
   return (
     <div

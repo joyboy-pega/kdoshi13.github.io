@@ -5,17 +5,15 @@ import { LogoBanner } from './LogoBanner';
 interface NavbarProps {
   mode: 'terminal' | 'game';
   onToggleMode: (mode: 'terminal' | 'game') => void;
-  currentUser?: any;
-  onLogin?: () => void;
-  onLogout?: () => void;
+  chatOpen: boolean;
+  onToggleChat: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   mode,
   onToggleMode,
-  currentUser,
-  onLogin,
-  onLogout,
+  chatOpen,
+  onToggleChat,
 }) => {
   const now = new Date();
   const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
@@ -34,13 +32,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         className="flex items-center justify-between px-2 py-0"
         style={{ background: '#1e1e1e', borderBottom: '1px solid #3a3a3a', height: '20px' }}
       >
-        {/* Left: path breadcrumb */}
         <div style={{ color: '#888' }}>
           <span style={{ color: '#5a5a5a' }}>~/portfolio/</span>
           <span style={{ color: '#9ece6a' }}>{contactInfo.name.toLowerCase().replace(/\s/g, '-')}</span>
         </div>
-
-        {/* Right: clock */}
         <div style={{ color: '#5a5a5a' }}>
           {dateStr} &nbsp; {timeStr}
         </div>
@@ -85,7 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           kevalos v1.2 &mdash; {contactInfo.title}
         </div>
 
-        {/* Right: links + auth */}
+        {/* Right: links + chat */}
         <div className="flex items-center" style={{ gap: '1px' }}>
           <a
             href={contactInfo.github}
@@ -112,23 +107,21 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             mail
           </a>
-          {currentUser ? (
-            <button
-              onClick={onLogout}
-              className="px-2 text-xs font-mono"
-              style={{ color: '#f7768e', background: 'transparent', border: 'none', borderLeft: '1px solid #3a3a3a', cursor: 'pointer', height: '24px' }}
-            >
-              logout [{currentUser.displayName?.split(' ')[0] || 'user'}]
-            </button>
-          ) : (
-            <button
-              onClick={onLogin}
-              className="px-2 text-xs font-mono"
-              style={{ color: '#9ece6a', background: 'transparent', border: 'none', borderLeft: '1px solid #3a3a3a', cursor: 'pointer', height: '24px' }}
-            >
-              login
-            </button>
-          )}
+          {/* Chat toggle — replaces login */}
+          <button
+            onClick={onToggleChat}
+            className="px-2 text-xs font-mono"
+            style={{
+              background: chatOpen ? '#264f78' : 'transparent',
+              border: 'none',
+              borderLeft: '1px solid #3a3a3a',
+              color: chatOpen ? '#ffffff' : '#9ece6a',
+              cursor: 'pointer',
+              height: '24px',
+            }}
+          >
+            [chat]
+          </button>
         </div>
       </div>
 
@@ -149,8 +142,8 @@ export const Navbar: React.FC<NavbarProps> = ({
         </span>
         <span style={{ color: '#5a5a5a', fontSize: '10px' }}>
           {mode === 'terminal'
-            ? 'type a command or use quick-run bar &mdash; press [Tab] to autocomplete &mdash; [Arrow Up/Down] for history'
-            : 'WASD / arrow keys to move &mdash; [Space] or [Enter] to interact &mdash; [Esc] to return to terminal'}
+            ? 'type a command or use quick-run bar -- [Tab] autocomplete -- [Arrow Up/Down] history'
+            : 'WASD / arrow keys to move -- [Space] interact -- [Esc] return to terminal'}
         </span>
       </div>
     </header>

@@ -1,12 +1,12 @@
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+const MODEL = 'qwen/qwen3.6-27b';
 
 async function startServer() {
   const app = express();
@@ -14,27 +14,32 @@ async function startServer() {
 
   app.use(express.json());
 
-  // API route for Gemini
-  app.post("/api/ai/query", async (req, res) => {
+  // Groq chat endpoint (replaces old Gemini AI endpoint)
+  app.post("/api/chat", async (req, res) => {
+    const { messages } = req.body || {};
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "messages array required" });
+    }
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "GROQ_API_KEY not set" });
+
     try {
-      const { prompt } = req.body;
-      if (!prompt) {
-        return res.status(400).json({ error: "Prompt is required" });
-      }
-
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
-        contents: prompt,
+      const response = await fetch(GROQ_URL, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ model: MODEL, messages, temperature: 0.7, max_tokens: 1024 }),
       });
-
-      res.json({ text: response.text });
-    } catch (error) {
-      console.error("Gemini API Error:", error);
-      res.status(500).json({ error: "Failed to process query" });
+      const data = await response.json() as { choices: { message: { content: string } }[] };
+      return res.json({ text: data.choices[0]?.message?.content || '' });
+    } catch (err) {
+      console.error("Groq error:", err);
+      return res.status(500).json({ error: "Failed to query Groq" });
     }
   });
 
-  // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -44,7 +49,7 @@ async function startServer() {
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
+    app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

@@ -1,16 +1,12 @@
 import React from 'react';
 import { contactInfo } from '../../../data/portfolioData';
 
-interface CmdWhoamiProps {
-  user?: any;
-}
-
-export const CmdWhoami: React.FC<CmdWhoamiProps> = ({ user }) => {
+export const CmdWhoami: React.FC = () => {
   const rows: [string, string, string?][] = [
     ['Name',    contactInfo.name],
     ['Role',    contactInfo.title],
     ['Domain',  'QA Engineering  /  Game Telemetry  /  Automation'],
-    ['Session', user ? `${user.displayName || user.email}  [authenticated]` : 'guest  [unauthenticated]'],
+    ['Session', 'guest [terminal visitor]'],
     ['Status',  'ACTIVE -- open for opportunities', '#9ece6a'],
     ['Quote',   '"Ensuring software quality through telemetry & automation."', '#5a5a5a'],
   ];

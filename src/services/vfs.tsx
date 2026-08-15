@@ -9,9 +9,6 @@ import { CmdProjects } from '../components/terminal/commands/CmdProjects';
 import { CmdSkills } from '../components/terminal/commands/CmdSkills';
 import { CmdEducation } from '../components/terminal/commands/CmdEducation';
 import { summaryText, contactInfo, experience, projects, skills, education } from '../data/portfolioData';
-import { auth, db, googleProvider } from './firebase';
-import { signInWithPopup, signOut } from 'firebase/auth';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export const createInitialVFS = (onLaunchGame?: () => void): Record<string, VFSNode> => {
   return {
@@ -126,7 +123,6 @@ export interface ExecuteOptions {
   vfs: Record<string, VFSNode>;
   setVfs: React.Dispatch<React.SetStateAction<Record<string, VFSNode>>>;
   cmdHistory: string[];
-  currentUser: any;
   onLaunchGame: () => void;
 }
 
@@ -137,7 +133,6 @@ export const executeCommand = async ({
   vfs,
   setVfs,
   cmdHistory,
-  currentUser,
   onLaunchGame
 }: ExecuteOptions): Promise<React.ReactNode | null> => {
   let cmdToRun = cmdStr;
@@ -167,7 +162,7 @@ export const executeCommand = async ({
     case 'help': 
       return <CmdHelp />;
     case 'whoami': 
-      return <CmdWhoami user={currentUser} />;
+      return <CmdWhoami />;
     case 'summary': 
       return <CmdSummary />;
     case 'contact': 
@@ -225,20 +220,6 @@ export const executeCommand = async ({
           }
           
           setVfs({ ...vfs });
-
-          if (currentUser) {
-            try {
-              await addDoc(collection(db, 'files'), {
-                userId: currentUser.uid,
-                path: targetPath,
-                content: newRawContent,
-                createdAt: serverTimestamp(),
-                updatedAt: serverTimestamp()
-              });
-            } catch (e) {
-              console.error("Failed to sync file to Firestore", e);
-            }
-          }
           return null;
         } else {
           return <div className="my-2 text-[#f7768e]">bash: {redirectTarget}: No such file or directory</div>;
@@ -337,20 +318,6 @@ export const executeCommand = async ({
       if (!pNode.children[name]) {
         pNode.children[name] = { type: 'file', content: '', rawContent: '' };
         setVfs({ ...vfs });
-        
-        if (currentUser) {
-          try {
-            await addDoc(collection(db, 'files'), {
-              userId: currentUser.uid,
-              path: target,
-              content: '',
-              createdAt: serverTimestamp(),
-              updatedAt: serverTimestamp()
-            });
-          } catch (e) {
-            console.error("Failed to sync file to Firestore", e);
-          }
-        }
       }
       return null;
     }
@@ -366,64 +333,24 @@ export const executeCommand = async ({
       );
     }
 
-    case 'login': {
-      try {
-        const res = await signInWithPopup(auth, googleProvider);
-        return <div className="my-2 text-[#9ece6a]">Successfully logged in as {res.user?.displayName || res.user?.email}</div>;
-      } catch (e: any) {
-        return <div className="my-2 text-[#f7768e]">Login failed: {e.message}</div>;
-      }
-    }
-
-    case 'logout': {
-      await signOut(auth);
-      return <div className="my-2 text-[#9ece6a]">Successfully logged out.</div>;
-    }
-
     case 'ai': {
       const prompt = args.slice(1).map(unquote).join(' ');
-      if (!prompt) return <div className="my-2 text-[#f7768e]">ai: missing query. Usage: ai "How many years of QA experience does Keval have?"</div>;
-      
+      if (!prompt) return <div className="my-2 text-[#f7768e]">ai: missing query. Usage: ai "your question here"</div>;
+
       try {
-        const res = await fetch('/api/ai/query', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ prompt })
+          body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] }),
         });
-        
         if (!res.ok) {
-          return (
-            <div className="my-2 text-[#e0af68] font-mono">
-              <div>[AI Note] The backend server is required for live Gemini AI queries.</div>
-              <div className="text-xs text-[#a9b1d6] mt-1">You can explore Keval's resume via summary, experience, projects, skills, or by launching game.</div>
-            </div>
-          );
+          return <div className="my-2 text-[#e0af68]">ai: server unavailable. Use [chat] button for AI chat.</div>;
         }
-        
-        const data = await res.json();
+        const data = await res.json() as { text?: string; error?: string };
         if (data.error) throw new Error(data.error);
-        
-        if (currentUser) {
-          try {
-            await addDoc(collection(db, 'queries'), {
-              userId: currentUser.uid,
-              prompt,
-              response: data.text,
-              createdAt: serverTimestamp()
-            });
-          } catch (e) {
-            console.error("Failed to sync AI query to Firestore", e);
-          }
-        }
-
         return <div className="my-2 text-[#7dcfff] whitespace-pre-wrap font-mono">{data.text}</div>;
       } catch (e: any) {
-        return (
-          <div className="my-2 text-[#e0af68] font-mono">
-            <div>AI Service response: Keval Doshi is a Test Engineer specialized in QA automation, PresentMon telemetry, and software development.</div>
-            <div className="text-xs text-[#565f89] mt-1">({e.message})</div>
-          </div>
-        );
+        return <div className="my-2 text-[#f7768e]">ai: {e.message}</div>;
       }
     }
 
