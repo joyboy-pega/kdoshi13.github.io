@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "description": "",
+  "name": "Keval Doshi Portfolio",
+  "description": "Interactive developer portfolio, terminal emulator (KevalOS), and 2D RPG resume showcase for Keval Doshi - Test Engineer & Software QA Specialist.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
