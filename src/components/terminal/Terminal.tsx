@@ -2,11 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { HistoryItem, VFSNode } from '../../types';
 import { StarshipPrompt } from './StarshipPrompt';
 import { BootBanner } from './BootBanner';
-import { CmdWhoami } from './commands/CmdWhoami';
-import { CmdSummary } from './commands/CmdSummary';
-import { CmdExperience } from './commands/CmdExperience';
-import { CmdProjects } from './commands/CmdProjects';
-import { CmdSkills } from './commands/CmdSkills';
 import { executeCommand, resolvePath, getNode } from '../../services/vfs';
 
 interface TerminalProps {
@@ -44,23 +39,18 @@ export const Terminal: React.FC<TerminalProps> = ({
         </div>
       ),
     },
-    { id: 1, type: 'input', content: 'whoami', cwd: '/home/guest/portfolio' },
-    { id: 2, type: 'output', content: <CmdWhoami user={currentUser} /> },
-    { id: 3, type: 'input', content: 'cat summary.txt', cwd: '/home/guest/portfolio' },
-    { id: 4, type: 'output', content: <CmdSummary /> },
-    { id: 5, type: 'input', content: './experience.sh', cwd: '/home/guest/portfolio' },
-    { id: 6, type: 'output', content: <CmdExperience /> },
-    { id: 7, type: 'input', content: './projects.sh', cwd: '/home/guest/portfolio' },
-    { id: 8, type: 'output', content: <CmdProjects /> },
-    { id: 9, type: 'input', content: 'cat skills.yml', cwd: '/home/guest/portfolio' },
-    { id: 10, type: 'output', content: <CmdSkills /> },
   ]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Only auto-scroll after a user-submitted command, never on initial render
+  const shouldScroll = useRef(false);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (shouldScroll.current) {
+      bottomRef.current?.scrollIntoView({ behavior: 'auto' });
+      shouldScroll.current = false;
+    }
   }, [history]);
 
   const handleTerminalClick = () => inputRef.current?.focus();
@@ -69,6 +59,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     if (!cmd.trim()) return;
     setCmdHistory(prev => [...prev, cmd]);
     setHistoryIdx(-1);
+    shouldScroll.current = true;
 
     const cmdId = Date.now();
     const snapshot: HistoryItem[] = [...history, { id: cmdId, type: 'input', content: cmd, cwd }];

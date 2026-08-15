@@ -1,13 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-/**
- * LogoBanner — wireframe outlined "Keval Doshi" heading.
- *
- * Reproduces the image: hollow outlined letters in blue (#4a7ab5)
- * on a near-black (#0d0d0d) background using CSS -webkit-text-stroke.
- * No gradients. No shadows. No emojis. Pure CSS.
- */
+const FULL_TEXT = 'Keval Doshi';
+const CHAR_DELAY = 90; // ms per character
+
 export const LogoBanner: React.FC = () => {
+  const [displayed, setDisplayed] = useState('');
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    let i = 0;
+    // Small initial pause before typing starts
+    const startTimer = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++;
+        setDisplayed(FULL_TEXT.slice(0, i));
+        if (i >= FULL_TEXT.length) {
+          clearInterval(interval);
+          setDone(true);
+        }
+      }, CHAR_DELAY);
+      return () => clearInterval(interval);
+    }, 200);
+    return () => clearTimeout(startTimer);
+  }, []);
+
   return (
     <div
       style={{
@@ -28,10 +44,37 @@ export const LogoBanner: React.FC = () => {
           textTransform: 'uppercase',
           padding: '0 2px',
           display: 'inline-block',
+          whiteSpace: 'nowrap',
         }}
       >
-        Keval Doshi
+        {displayed}
+        {/* Blinking cursor — solid while typing, then fades out after done */}
+        <span
+          style={{
+            display: 'inline-block',
+            width: '3px',
+            height: '0.75em',
+            background: '#4a7ab5',
+            marginLeft: '4px',
+            verticalAlign: 'baseline',
+            position: 'relative',
+            top: '0.05em',
+            animation: done ? 'cursorFadeOut 1.5s ease forwards' : 'blink 0.55s step-end infinite',
+          }}
+        />
       </div>
+
+      <style>{`
+        @keyframes blink {
+          0%, 100% { opacity: 1; }
+          50%       { opacity: 0; }
+        }
+        @keyframes cursorFadeOut {
+          0%   { opacity: 1; }
+          60%  { opacity: 1; }
+          100% { opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 };
