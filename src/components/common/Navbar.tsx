@@ -1,5 +1,6 @@
 import React from 'react';
 import { contactInfo } from '../../data/portfolioData';
+import { LogoBanner } from './LogoBanner';
 
 interface NavbarProps {
   mode: 'terminal' | 'game';
@@ -25,6 +26,9 @@ export const Navbar: React.FC<NavbarProps> = ({
       className="w-full font-mono text-xs select-none"
       style={{ background: '#0d0d0d', borderBottom: '1px solid #3a3a3a' }}
     >
+      {/* ── Wireframe name logo ── */}
+      <LogoBanner />
+
       {/* ── Top status bar ── */}
       <div
         className="flex items-center justify-between px-2 py-0"
