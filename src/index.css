@@ -2,12 +2,20 @@
 
 @theme {
   --font-mono: "Fira Code", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-vt323: "VT323", monospace;
 }
 
 body {
-  @apply bg-[#1a1b26] text-[#a9b1d6] font-mono antialiased;
+  background-color: #1a1b26;
+  color: #a9b1d6;
+  font-family: var(--font-mono);
   margin: 0;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-vt323 {
+  font-family: var(--font-vt323);
 }
 
 .cursor-blink {
@@ -19,7 +27,35 @@ body {
   50% { opacity: 0; }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
 ::selection {
   background: rgba(122, 162, 247, 0.3);
   color: #fff;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #16161e;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #292e42;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #414868;
 }
