@@ -70,7 +70,6 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleInput]);
 
-  // Check if player is adjacent to any NPC/Chest to show prompt
   useEffect(() => {
     const directions = [
       { x: 0, y: -1 },
@@ -86,7 +85,7 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
       if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT) {
         const tile = GAME_MAP[ny][nx];
         if (RESUME_CONTENT[tile]) {
-          foundHint = `Press SPACE to inspect ${RESUME_CONTENT[tile].title}`;
+          foundHint = `Press [SPACE] to inspect ${RESUME_CONTENT[tile].title}`;
           break;
         }
       }
@@ -95,21 +94,19 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
   }, [playerPos]);
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center p-2 sm:p-4 select-none">
+    <div className="w-full flex-1 flex flex-col items-center justify-center p-2 sm:p-4 select-none font-mono">
       
       {/* Top Game Bar */}
-      <div className="w-full max-w-2xl flex items-center justify-between mb-3 px-2 text-xs sm:text-sm font-mono">
-        <div className="flex items-center gap-2 text-[#9ece6a] bg-[#1a1b26]/80 px-3 py-1.5 rounded-lg border border-[#414868]">
-          <span>🎮</span>
+      <div className="w-full max-w-2xl flex items-center justify-between mb-3 px-2 text-xs sm:text-sm">
+        <div className="flex items-center gap-2 text-[#9ece6a] bg-[#1a1b26]/80 px-3 py-1.5 rounded border border-[#414868]">
           <span className="font-bold">Keval's Legend (RPG Mode)</span>
         </div>
         {onExitToTerminal && (
           <button 
             onClick={onExitToTerminal}
-            className="flex items-center gap-1.5 bg-[#24283b] hover:bg-[#414868] text-[#7aa2f7] hover:text-white px-3 py-1.5 rounded-lg border border-[#414868] transition-all font-semibold"
+            className="flex items-center gap-1.5 bg-[#24283b] hover:bg-[#414868] text-[#7aa2f7] hover:text-white px-3 py-1.5 rounded border border-[#414868] transition-all font-semibold"
           >
-            <span>💻</span>
-            <span>Back to Terminal</span>
+            <span>[Back to Terminal]</span>
             <span className="text-[10px] text-[#565f89] hidden sm:inline">[ESC]</span>
           </button>
         )}
@@ -117,7 +114,7 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
 
       {/* Game Viewport Canvas */}
       <div 
-        className="relative bg-[#68b840] shadow-[0_0_0_6px_#24283b,0_0_0_10px_#414868,0_20px_50px_rgba(0,0,0,0.8)] rounded-xl overflow-hidden max-w-full"
+        className="relative bg-[#4e8d30] shadow-[0_0_0_4px_#24283b,0_0_0_8px_#414868,0_20px_50px_rgba(0,0,0,0.8)] rounded-lg overflow-hidden max-w-full"
         style={{
           width: MAP_WIDTH * TILE_SIZE,
           height: MAP_HEIGHT * TILE_SIZE,
@@ -133,19 +130,19 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
 
         {/* Legend / Overlay banner */}
         {!dialogContent && (
-          <div className="absolute top-2 left-2 text-[#f8f8f8] bg-[#1a1b26]/90 border-2 border-[#414868] p-2 sm:p-2.5 rounded-lg flex flex-col gap-0.5 text-xs font-mono shadow-md backdrop-blur-xs">
-            <span className="font-bold text-[#7dcfff] flex items-center gap-1">
-              <span>🧭</span> WASD / Arrow Keys to Move
+          <div className="absolute top-2 left-2 text-[#f8f8f8] bg-[#1a1b26]/90 border border-[#414868] p-2 rounded flex flex-col gap-0.5 text-xs shadow-md">
+            <span className="font-bold text-[#7dcfff]">
+              WASD / Arrow Keys: Move
             </span>
             <span className="text-[#a9b1d6]">
-              Space / Enter: Interact with NPCs & Chests
+              Space / Enter: Interact
             </span>
           </div>
         )}
 
         {/* Proximity Interaction Hint */}
         {activeHint && !dialogContent && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#7aa2f7] text-[#1a1b26] font-bold px-3 py-1 rounded-full text-xs font-mono shadow-lg animate-bounce z-30">
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#7aa2f7] text-[#1a1b26] font-bold px-3 py-1 rounded-full text-xs shadow-lg animate-bounce z-30">
             {activeHint}
           </div>
         )}
@@ -166,21 +163,21 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
       />
 
       {/* Bottom Quick Legend */}
-      <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#a9b1d6] font-mono">
-        <span className="flex items-center gap-1 bg-[#1f2335] px-2 py-1 rounded border border-[#292e42]">
-          <span>🧙‍♂️</span> Sage = Summary
+      <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#a9b1d6]">
+        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#7aa2f7]" /> [S] Summary
         </span>
-        <span className="flex items-center gap-1 bg-[#1f2335] px-2 py-1 rounded border border-[#292e42]">
-          <span>⚔️</span> Blacksmith = Experience
+        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#f7768e]" /> [EXP] Experience
         </span>
-        <span className="flex items-center gap-1 bg-[#1f2335] px-2 py-1 rounded border border-[#292e42]">
-          <span>💎</span> Chest = Projects
+        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
+          <span className="w-2.5 h-2.5 rounded bg-[#e89d2d]" /> [PRJ] Projects
         </span>
-        <span className="flex items-center gap-1 bg-[#1f2335] px-2 py-1 rounded border border-[#292e42]">
-          <span>🎯</span> Target = Skills
+        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#9ece6a]" /> [SKL] Skills
         </span>
-        <span className="flex items-center gap-1 bg-[#1f2335] px-2 py-1 rounded border border-[#292e42]">
-          <span>📜</span> Scroll = Education
+        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
+          <span className="w-2.5 h-2.5 rounded bg-[#e0af68]" /> [EDU] Education
         </span>
       </div>
     </div>

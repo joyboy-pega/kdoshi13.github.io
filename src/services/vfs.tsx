@@ -29,7 +29,7 @@ export const createInitialVFS = (onLaunchGame?: () => void): Record<string, VFSN
                   content: (
                     <div className="text-[#a9b1d6] font-mono leading-relaxed my-2">
                       <p className="font-bold text-[#7aa2f7]"># Keval Doshi Portfolio (KevalOS)</p>
-                      <p className="mt-1">Welcome! You can explore my experience and projects using standard terminal commands or launch the 2D retro RPG game.</p>
+                      <p className="mt-1">Welcome! You can explore experience and projects using terminal commands or launch the 2D RPG game.</p>
                       <p className="mt-1 text-[#9ece6a]">Tip: Type <span className="underline">./game.sh</span> or <span className="underline">game</span> to enter RPG mode.</p>
                     </div>
                   ),
@@ -69,7 +69,7 @@ export const createInitialVFS = (onLaunchGame?: () => void): Record<string, VFSN
                   type: 'exec',
                   content: (
                     <div className="my-2 text-[#9ece6a] font-mono">
-                      <span>🎮 Initializing Keval's Legend 2D RPG Adventure...</span>
+                      <span>Initializing Keval's Legend 2D RPG Adventure...</span>
                     </div>
                   ),
                   rawContent: `#!/bin/bash\n# Launch 2D RPG\nopen_game_engine`
@@ -195,7 +195,7 @@ export const executeCommand = async ({
       onLaunchGame();
       return (
         <div className="my-2 text-[#9ece6a] font-mono">
-          <span>🎮 Switching to Keval's Legend (2D RPG Adventure Mode)...</span>
+          <span>Switching to Keval's Legend (2D RPG Adventure Mode)...</span>
         </div>
       );
     }
@@ -392,11 +392,10 @@ export const executeCommand = async ({
         });
         
         if (!res.ok) {
-          // If running statically on GitHub Pages or server endpoint not available
           return (
             <div className="my-2 text-[#e0af68] font-mono">
               <div>[AI Note] The backend server is required for live Gemini AI queries.</div>
-              <div className="text-xs text-[#a9b1d6] mt-1">You can explore Keval's resume via `summary`, `experience`, `projects`, `skills`, or by launching `game`!</div>
+              <div className="text-xs text-[#a9b1d6] mt-1">You can explore Keval's resume via summary, experience, projects, skills, or by launching game.</div>
             </div>
           );
         }
@@ -432,7 +431,7 @@ export const executeCommand = async ({
       let target = resolvePath(cwd, cmd);
       if (cmd === './game.sh' || cmd === 'game.sh') {
         onLaunchGame();
-        return <div className="my-2 text-[#9ece6a] font-mono">🎮 Launching 2D RPG Adventure mode...</div>;
+        return <div className="my-2 text-[#9ece6a] font-mono">Launching 2D RPG Adventure mode...</div>;
       }
       
       const node = getNode(vfs, target);

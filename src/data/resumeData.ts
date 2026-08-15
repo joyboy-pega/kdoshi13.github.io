@@ -2,7 +2,7 @@ import { summaryText, experience, projects, skills, education } from './portfoli
 
 export const RESUME_CONTENT: Record<string, { title: string, text: string[] }> = {
   'S': {
-    title: 'Wise Sage (Summary)',
+    title: 'Sage (Summary)',
     text: [
       "Greetings traveler! I am Keval Doshi, a Test Engineer & Software QA Specialist.",
       "I hold an MCA and a BBA in Computer Applications.",
@@ -15,14 +15,14 @@ export const RESUME_CONTENT: Record<string, { title: string, text: string[] }> =
   'E': {
     title: 'Ancient Archives (Education)',
     text: [
-      "* You blow the dust off an ancient parchment scroll... *",
+      "You inspect an ancient parchment scroll...",
       ...education.map(edu => `[ ${edu.period} ]\n${edu.degree}\n${edu.school}${edu.detail ? ` | ${edu.detail}` : ''}`)
     ]
   },
   'X': {
     title: 'The Blacksmith (Experience)',
     text: [
-      "Work experience? Aye, I've forged my skills in the fires of the software industry!",
+      "Work experience? I have forged my skills in the fires of the software industry.",
       `[ ${experience[0].period} ]\n${experience[0].role} at ${experience[0].company}`,
       experience[0].items.join("\n"),
       `[ ${experience[1].period} ]\n${experience[1].role} at ${experience[1].company}`,
@@ -32,14 +32,14 @@ export const RESUME_CONTENT: Record<string, { title: string, text: string[] }> =
   'P': {
     title: 'Treasure Chest (Projects)',
     text: [
-      "* You open the heavy golden chest. Inside are artifacts of creation! *",
+      "You open the heavy chest. Inside are artifacts of creation:",
       ...projects.map(proj => `[ ${proj.name} ] (${proj.tech})\n${proj.desc}`)
     ]
   },
   'K': {
     title: 'Training Grounds (Skills)',
     text: [
-      "* A sturdy training dummy stands here, engraved with masteries. *",
+      "A sturdy training target stands here, engraved with disciplines:",
       ...Object.entries(skills).map(([cat, list]) => `[ ${cat} ]\n${list.join(', ')}`)
     ]
   }

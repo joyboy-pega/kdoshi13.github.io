@@ -59,10 +59,10 @@ export const Dialog: React.FC<DialogProps> = ({ content, onClose }) => {
 
   return (
     <div 
-      className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 bg-[#1b2b44]/95 border-[4px] sm:border-[5px] border-[#f0f0f0] p-3 sm:p-4 text-[#f8f8f8] z-50 shadow-2xl rounded-xl cursor-pointer min-h-[130px] font-mono backdrop-blur-sm select-none" 
+      className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 bg-[#1b2b44]/95 border-2 border-[#f0f0f0] p-3 sm:p-4 text-[#f8f8f8] z-50 shadow-2xl rounded-lg cursor-pointer min-h-[130px] font-mono select-none" 
       onClick={handleNext}
     >
-      <div className="text-[#88d860] mb-1.5 uppercase tracking-wider text-base sm:text-lg font-bold flex items-center justify-between border-b border-[#88d860]/30 pb-1">
+      <div className="text-[#88d860] mb-1.5 uppercase tracking-wider text-sm sm:text-base font-bold flex items-center justify-between border-b border-[#88d860]/30 pb-1">
         <span>{content.title}</span>
         <span className="text-xs text-[#a9b1d6] font-normal">Page {page + 1}/{content.text.length}</span>
       </div>
@@ -72,8 +72,8 @@ export const Dialog: React.FC<DialogProps> = ({ content, onClose }) => {
       <div className="flex justify-between items-center mt-2 text-xs text-[#7aa2f7]">
         <span>Click or [Space / Enter] to continue</span>
         {!isTyping && (
-          <span className="text-[#88d860] animate-bounce font-bold">
-            {page < content.text.length - 1 ? '▼ NEXT' : '✕ CLOSE'}
+          <span className="text-[#88d860] font-bold">
+            {page < content.text.length - 1 ? '[NEXT >]' : '[CLOSE]'}
           </span>
         )}
       </div>

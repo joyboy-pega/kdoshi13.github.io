@@ -4,7 +4,6 @@ import { StarshipPrompt } from './StarshipPrompt';
 import { BootBanner } from './BootBanner';
 import { CmdWhoami } from './commands/CmdWhoami';
 import { CmdSummary } from './commands/CmdSummary';
-import { CmdContact } from './commands/CmdContact';
 import { CmdExperience } from './commands/CmdExperience';
 import { CmdProjects } from './commands/CmdProjects';
 import { CmdSkills } from './commands/CmdSkills';
@@ -38,7 +37,7 @@ export const Terminal: React.FC<TerminalProps> = ({
           <div className="mb-2 text-xs text-[#565f89]">Last login: {new Date().toDateString()} on ttys001 (KevalOS)</div>
           <BootBanner />
           <div className="mt-2 text-sm">
-            Type <span className="text-[#1a1b26] font-bold bg-[#7dcfff] px-1.5 py-0.5 rounded">help</span> to list commands, or type <span className="text-[#1a1b26] font-bold bg-[#9ece6a] px-1.5 py-0.5 rounded">game</span> to explore the 2D RPG resume.
+            Type <span className="text-[#1a1b26] font-bold bg-[#7dcfff] px-1.5 py-0.5 rounded">help</span> to list commands, or type <span className="text-[#1a1b26] font-bold bg-[#9ece6a] px-1.5 py-0.5 rounded">game</span> to enter RPG mode.
           </div>
         </div>
       )
@@ -159,15 +158,15 @@ export const Terminal: React.FC<TerminalProps> = ({
   };
 
   const quickCommands = [
-    { label: '❓ help', cmd: 'help' },
-    { label: '📄 summary', cmd: 'summary' },
-    { label: '💼 experience', cmd: 'experience' },
-    { label: '🚀 projects', cmd: 'projects' },
-    { label: '🛠️ skills', cmd: 'skills' },
-    { label: '🎓 education', cmd: 'education' },
-    { label: '✉️ contact', cmd: 'contact' },
-    { label: '🎮 play rpg', cmd: 'game' },
-    { label: '🧹 clear', cmd: 'clear' }
+    { label: 'help', cmd: 'help' },
+    { label: 'summary', cmd: 'summary' },
+    { label: 'experience', cmd: 'experience' },
+    { label: 'projects', cmd: 'projects' },
+    { label: 'skills', cmd: 'skills' },
+    { label: 'education', cmd: 'education' },
+    { label: 'contact', cmd: 'contact' },
+    { label: 'play rpg', cmd: 'game' },
+    { label: 'clear', cmd: 'clear' }
   ];
 
   return (
@@ -179,7 +178,7 @@ export const Terminal: React.FC<TerminalProps> = ({
         
         {/* Quick Command Suggestions */}
         <div className="mb-6 flex flex-wrap items-center gap-2 select-none border-b border-[#24283b] pb-4">
-          <span className="text-xs text-[#565f89] font-bold uppercase tracking-wider mr-1">Quick Run:</span>
+          <span className="text-xs text-[#565f89] font-bold uppercase tracking-wider mr-1">Run:</span>
           {quickCommands.map((qc, i) => (
             <button
               key={i}
@@ -187,7 +186,7 @@ export const Terminal: React.FC<TerminalProps> = ({
                 e.stopPropagation();
                 runCommandDirectly(qc.cmd);
               }}
-              className="text-xs bg-[#1f2335] hover:bg-[#2e344e] text-[#7dcfff] hover:text-white px-2.5 py-1 rounded-md border border-[#292e42] hover:border-[#7aa2f7] transition-all cursor-pointer shadow-sm"
+              className="text-xs bg-[#1f2335] hover:bg-[#2e344e] text-[#7dcfff] hover:text-white px-2.5 py-1 rounded border border-[#292e42] hover:border-[#7aa2f7] transition-all cursor-pointer shadow-sm font-semibold"
             >
               {qc.label}
             </button>
