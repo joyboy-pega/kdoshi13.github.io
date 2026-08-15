@@ -16,64 +16,57 @@ export const Dialog: React.FC<DialogProps> = ({ content, onClose }) => {
     let i = 0;
     setIsTyping(true);
     setDisplayedText('');
-
     const interval = setInterval(() => {
       setDisplayedText(fullText.substring(0, i + 1));
       i++;
-      if (i >= fullText.length) {
-        clearInterval(interval);
-        setIsTyping(false);
-      }
-    }, 20);
-
+      if (i >= fullText.length) { clearInterval(interval); setIsTyping(false); }
+    }, 18);
     return () => clearInterval(interval);
   }, [fullText]);
 
   const handleNext = useCallback(() => {
-    if (isTyping) {
-      setIsTyping(false);
-      setDisplayedText(fullText);
-    } else {
-      if (page < content.text.length - 1) {
-        setPage(prev => prev + 1);
-      } else {
-        onClose();
-      }
-    }
+    if (isTyping) { setIsTyping(false); setDisplayedText(fullText); }
+    else if (page < content.text.length - 1) setPage(p => p + 1);
+    else onClose();
   }, [isTyping, fullText, page, content.text.length, onClose]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === ' ' || e.key === 'Enter' || e.key === 'Escape') {
-        e.preventDefault();
-        if (e.key === 'Escape') {
-          onClose();
-        } else {
-          handleNext();
-        }
-      }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); handleNext(); }
+      if (e.key === 'Escape') { e.preventDefault(); onClose(); }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [handleNext, onClose]);
 
+  const line = '─'.repeat(56);
+
   return (
-    <div 
-      className="absolute bottom-3 left-3 right-3 sm:bottom-4 sm:left-4 sm:right-4 bg-[#1b2b44]/95 border-2 border-[#f0f0f0] p-3 sm:p-4 text-[#f8f8f8] z-50 shadow-2xl rounded-lg cursor-pointer min-h-[130px] font-mono select-none" 
+    <div
+      className="absolute bottom-0 left-0 right-0 font-mono text-sm cursor-pointer select-none"
+      style={{ background: '#0d0d0d', border: '1px solid #7aa2f7', zIndex: 50 }}
       onClick={handleNext}
     >
-      <div className="text-[#88d860] mb-1.5 uppercase tracking-wider text-sm sm:text-base font-bold flex items-center justify-between border-b border-[#88d860]/30 pb-1">
-        <span>{content.title}</span>
-        <span className="text-xs text-[#a9b1d6] font-normal">Page {page + 1}/{content.text.length}</span>
+      {/* Title bar */}
+      <div className="flex items-center justify-between px-2 py-0.5" style={{ background: '#264f78', color: '#fff', borderBottom: '1px solid #7aa2f7' }}>
+        <span style={{ color: '#ffffff' }}>{'[ ' + content.title + ' ]'}</span>
+        <span style={{ color: '#88c0d0', fontSize: '11px' }}>{page + 1} / {content.text.length}</span>
       </div>
-      <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap font-mono">
-        {displayedText}
+
+      {/* Text content */}
+      <div className="px-3 py-2" style={{ minHeight: '80px', color: '#c8c8c8' }}>
+        <pre className="whitespace-pre-wrap font-mono text-sm" style={{ margin: 0 }}>
+          {displayedText}
+          {isTyping && <span className="cursor-blink">_</span>}
+        </pre>
       </div>
-      <div className="flex justify-between items-center mt-2 text-xs text-[#7aa2f7]">
-        <span>Click or [Space / Enter] to continue</span>
+
+      {/* Bottom status */}
+      <div className="flex items-center justify-between px-2 py-0.5" style={{ borderTop: '1px solid #3a3a3a', color: '#5a5a5a', fontSize: '11px' }}>
+        <span>[Space] / [Enter] to continue  &mdash;  [Esc] to close</span>
         {!isTyping && (
-          <span className="text-[#88d860] font-bold">
-            {page < content.text.length - 1 ? '[NEXT >]' : '[CLOSE]'}
+          <span style={{ color: '#9ece6a' }}>
+            {page < content.text.length - 1 ? '[ NEXT > ]' : '[ CLOSE ]'}
           </span>
         )}
       </div>

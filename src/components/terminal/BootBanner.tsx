@@ -2,36 +2,44 @@ import React from 'react';
 
 export const BootBanner: React.FC = () => {
   return (
-    <div className="mb-6 mt-2 p-4 rounded-lg bg-[#1f2335]/50 border border-[#292e42] text-[#a9b1d6] font-mono">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#292e42] pb-2 mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#9ece6a]" />
-          <span className="font-bold text-[#c0caf5] text-sm sm:text-base">KEVAL DOSHI</span>
-          <span className="text-xs text-[#565f89]">|</span>
-          <span className="text-xs text-[#7aa2f7]">Test Engineer & QA Automation</span>
-        </div>
-        <div className="text-xs text-[#565f89]">KevalOS v1.2</div>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-1.5 gap-x-4 text-xs">
-        <div><span className="text-[#565f89]">OS:</span> KevalOS 1.2 (BrowserVFS)</div>
-        <div><span className="text-[#565f89]">Host:</span> Starship Terminal</div>
-        <div><span className="text-[#565f89]">Kernel:</span> Web 5.0 (React 19)</div>
-        <div><span className="text-[#565f89]">Status:</span> Available for Hire</div>
-        <div><span className="text-[#565f89]">Shell:</span> bash 5.2</div>
-        <div><span className="text-[#565f89]">Theme:</span> Tokyo Night</div>
+    <div className="font-mono text-xs" style={{ color: '#c8c8c8' }}>
+      {/* Top rule */}
+      <div style={{ color: '#3a3a3a' }}>
+        {'┌' + '─'.repeat(60) + '┐'}
       </div>
 
-      <div className="flex items-center gap-1.5 mt-3 pt-2 border-t border-[#292e42]/60">
-        <span className="text-[10px] text-[#565f89] mr-1">Palette:</span>
-        <div className="w-3.5 h-3.5 bg-[#1a1b26] border border-[#414868] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#f7768e] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#9ece6a] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#e0af68] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#7aa2f7] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#bb9af7] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#7dcfff] rounded-xs" />
-        <div className="w-3.5 h-3.5 bg-[#a9b1d6] rounded-xs" />
+      {/* System info block */}
+      <div style={{ borderLeft: '1px solid #3a3a3a', borderRight: '1px solid #3a3a3a' }}>
+        <div className="px-2 py-1" style={{ borderBottom: '1px solid #3a3a3a' }}>
+          <span style={{ color: '#9ece6a' }}>kevalos</span>
+          <span style={{ color: '#5a5a5a' }}>@</span>
+          <span style={{ color: '#7aa2f7' }}>portfolio</span>
+          <span style={{ color: '#5a5a5a' }}>  v1.2  </span>
+          <span style={{ color: '#3a3a3a' }}>─────────────────────────────────</span>
+        </div>
+
+        <div className="px-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1px 16px', padding: '6px 8px' }}>
+          <div><span style={{ color: '#5a5a5a' }}>OS      </span><span>KevalOS 1.2 (BrowserVFS)</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Status  </span><span style={{ color: '#9ece6a' }}>OPEN TO HIRE</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Role    </span><span>Test Engineer</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Domain  </span><span>QA / Automation</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Shell   </span><span>bash 5.2</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Theme   </span><span>Tokyo Night (TUI)</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Kernel  </span><span>React 19 + TypeScript</span></div>
+          <div><span style={{ color: '#5a5a5a' }}>Build   </span><span>Vite 6 + Tailwind v4</span></div>
+        </div>
+
+        <div className="px-2" style={{ borderTop: '1px solid #3a3a3a', padding: '4px 8px' }}>
+          <span style={{ color: '#5a5a5a' }}>Palette </span>
+          {(['#0d0d0d','#f7768e','#9ece6a','#e0af68','#7aa2f7','#bb9af7','#7dcfff','#c8c8c8'] as const).map((c, i) => (
+            <span key={i} style={{ background: c, color: c, marginRight: '2px' }}>{'  '}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Bottom rule */}
+      <div style={{ color: '#3a3a3a' }}>
+        {'└' + '─'.repeat(60) + '┘'}
       </div>
     </div>
   );

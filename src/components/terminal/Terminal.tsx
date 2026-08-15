@@ -7,7 +7,6 @@ import { CmdSummary } from './commands/CmdSummary';
 import { CmdExperience } from './commands/CmdExperience';
 import { CmdProjects } from './commands/CmdProjects';
 import { CmdSkills } from './commands/CmdSkills';
-import { CmdEducation } from './commands/CmdEducation';
 import { executeCommand, resolvePath, getNode } from '../../services/vfs';
 
 interface TerminalProps {
@@ -18,10 +17,7 @@ interface TerminalProps {
 }
 
 export const Terminal: React.FC<TerminalProps> = ({
-  vfs,
-  setVfs,
-  currentUser,
-  onLaunchGame
+  vfs, setVfs, currentUser, onLaunchGame,
 }) => {
   const [cwd, setCwd] = useState('/home/guest/portfolio');
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
@@ -33,14 +29,20 @@ export const Terminal: React.FC<TerminalProps> = ({
       id: 0,
       type: 'output',
       content: (
-        <div className="mb-4 text-[#a9b1d6]">
-          <div className="mb-2 text-xs text-[#565f89]">Last login: {new Date().toDateString()} on ttys001 (KevalOS)</div>
+        <div className="mb-3">
+          <div className="text-xs mb-2" style={{ color: '#5a5a5a' }}>
+            Last login: {new Date().toDateString()} on pts/0
+          </div>
           <BootBanner />
-          <div className="mt-2 text-sm">
-            Type <span className="text-[#1a1b26] font-bold bg-[#7dcfff] px-1.5 py-0.5 rounded">help</span> to list commands, or type <span className="text-[#1a1b26] font-bold bg-[#9ece6a] px-1.5 py-0.5 rounded">game</span> to enter RPG mode.
+          <div className="text-sm mt-2" style={{ color: '#c8c8c8' }}>
+            Type{' '}
+            <span style={{ color: '#9ece6a', background: '#1a1a1a', padding: '0 4px', border: '1px solid #3a3a3a' }}>help</span>
+            {' '}to list commands &mdash; type{' '}
+            <span style={{ color: '#7aa2f7', background: '#1a1a1a', padding: '0 4px', border: '1px solid #3a3a3a' }}>game</span>
+            {' '}to enter RPG mode
           </div>
         </div>
-      )
+      ),
     },
     { id: 1, type: 'input', content: 'whoami', cwd: '/home/guest/portfolio' },
     { id: 2, type: 'output', content: <CmdWhoami user={currentUser} /> },
@@ -51,7 +53,7 @@ export const Terminal: React.FC<TerminalProps> = ({
     { id: 7, type: 'input', content: './projects.sh', cwd: '/home/guest/portfolio' },
     { id: 8, type: 'output', content: <CmdProjects /> },
     { id: 9, type: 'input', content: 'cat skills.yml', cwd: '/home/guest/portfolio' },
-    { id: 10, type: 'output', content: <CmdSkills /> }
+    { id: 10, type: 'output', content: <CmdSkills /> },
   ]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -61,44 +63,33 @@ export const Terminal: React.FC<TerminalProps> = ({
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [history]);
 
-  const handleTerminalClick = () => {
-    inputRef.current?.focus();
-  };
+  const handleTerminalClick = () => inputRef.current?.focus();
 
-  const runCommandDirectly = async (cmd: string) => {
+  const runCmd = async (cmd: string) => {
     if (!cmd.trim()) return;
-    
     setCmdHistory(prev => [...prev, cmd]);
     setHistoryIdx(-1);
 
     const cmdId = Date.now();
-    const newHistory: HistoryItem[] = [...history, { id: cmdId, type: 'input', content: cmd, cwd }];
+    const snapshot: HistoryItem[] = [...history, { id: cmdId, type: 'input', content: cmd, cwd }];
 
-    if (cmd.trim().toLowerCase() === 'clear') {
-      setHistory([]);
-      return;
-    }
+    if (cmd.trim().toLowerCase() === 'clear') { setHistory([]); return; }
 
     const loadingId = cmdId + 1;
-    setHistory([...newHistory, { id: loadingId, type: 'output', content: <div className="my-2 text-[#565f89] font-mono">Running...</div> }]);
+    setHistory([
+      ...snapshot,
+      {
+        id: loadingId,
+        type: 'output',
+        content: <span className="text-xs" style={{ color: '#5a5a5a' }}>executing...</span>,
+      },
+    ]);
 
-    const output = await executeCommand({
-      cmdStr: cmd,
-      cwd,
-      setCwd,
-      vfs,
-      setVfs,
-      cmdHistory,
-      currentUser,
-      onLaunchGame
-    });
+    const output = await executeCommand({ cmdStr: cmd, cwd, setCwd, vfs, setVfs, cmdHistory, currentUser, onLaunchGame });
 
     setHistory(prev => {
       const filtered = prev.filter(h => h.id !== loadingId);
-      if (output !== null) {
-        return [...filtered, { id: Date.now(), type: 'output', content: output }];
-      }
-      return filtered;
+      return output !== null ? [...filtered, { id: Date.now(), type: 'output', content: output }] : filtered;
     });
   };
 
@@ -106,44 +97,33 @@ export const Terminal: React.FC<TerminalProps> = ({
     if (e.key === 'Enter') {
       const cmd = input;
       setInput('');
-      
       if (!cmd.trim()) {
         setHistory(prev => [...prev, { id: Date.now(), type: 'input', content: '', cwd }]);
         return;
       }
-      
-      await runCommandDirectly(cmd);
+      await runCmd(cmd);
     } else if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (cmdHistory.length > 0) {
-        const nextIdx = historyIdx === -1 ? cmdHistory.length - 1 : Math.max(0, historyIdx - 1);
-        setHistoryIdx(nextIdx);
-        setInput(cmdHistory[nextIdx]);
+        const idx = historyIdx === -1 ? cmdHistory.length - 1 : Math.max(0, historyIdx - 1);
+        setHistoryIdx(idx);
+        setInput(cmdHistory[idx]);
       }
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (historyIdx !== -1) {
-        const nextIdx = historyIdx + 1;
-        if (nextIdx >= cmdHistory.length) {
-          setHistoryIdx(-1);
-          setInput('');
-        } else {
-          setHistoryIdx(nextIdx);
-          setInput(cmdHistory[nextIdx]);
-        }
+        const idx = historyIdx + 1;
+        if (idx >= cmdHistory.length) { setHistoryIdx(-1); setInput(''); }
+        else { setHistoryIdx(idx); setInput(cmdHistory[idx]); }
       }
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const parts = input.split(' ');
       const lastPart = parts[parts.length - 1];
-      
       if (lastPart.length > 0) {
         const prefixDir = lastPart.includes('/') ? lastPart.substring(0, lastPart.lastIndexOf('/') + 1) : '';
         const searchPrefix = lastPart.includes('/') ? lastPart.substring(lastPart.lastIndexOf('/') + 1) : lastPart;
-        
-        const searchPath = resolvePath(cwd, prefixDir || '.');
-        const node = getNode(vfs, searchPath);
-        
+        const node = getNode(vfs, resolvePath(cwd, prefixDir || '.'));
         if (node && node.type === 'dir' && node.children) {
           const matches = Object.keys(node.children).filter(k => k.startsWith(searchPrefix));
           if (matches.length === 1) {
@@ -157,73 +137,91 @@ export const Terminal: React.FC<TerminalProps> = ({
     }
   };
 
-  const quickCommands = [
-    { label: 'help', cmd: 'help' },
-    { label: 'summary', cmd: 'summary' },
-    { label: 'experience', cmd: 'experience' },
-    { label: 'projects', cmd: 'projects' },
-    { label: 'skills', cmd: 'skills' },
-    { label: 'education', cmd: 'education' },
-    { label: 'contact', cmd: 'contact' },
-    { label: 'play rpg', cmd: 'game' },
-    { label: 'clear', cmd: 'clear' }
+  const quickCmds = [
+    'help', 'summary', 'experience', 'projects', 'skills', 'education', 'contact', 'game', 'clear',
   ];
 
+  const userLabel = currentUser
+    ? (currentUser.displayName?.toLowerCase().replace(/\s+/g, '') || 'user')
+    : 'guest';
+
   return (
-    <div 
-      className="flex-1 w-full p-4 sm:p-8 md:p-12 font-mono cursor-text text-[#a9b1d6]"
+    <div
+      className="flex-1 w-full font-mono cursor-text"
+      style={{ background: '#0d0d0d', color: '#c8c8c8' }}
       onClick={handleTerminalClick}
     >
-      <div className="max-w-4xl mx-auto pb-24 relative z-10">
-        
-        {/* Quick Command Suggestions */}
-        <div className="mb-6 flex flex-wrap items-center gap-2 select-none border-b border-[#24283b] pb-4">
-          <span className="text-xs text-[#565f89] font-bold uppercase tracking-wider mr-1">Run:</span>
-          {quickCommands.map((qc, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                runCommandDirectly(qc.cmd);
-              }}
-              className="text-xs bg-[#1f2335] hover:bg-[#2e344e] text-[#7dcfff] hover:text-white px-2.5 py-1 rounded border border-[#292e42] hover:border-[#7aa2f7] transition-all cursor-pointer shadow-sm font-semibold"
-            >
-              {qc.label}
-            </button>
-          ))}
-        </div>
+      {/* Quick-run chip bar */}
+      <div
+        className="flex flex-wrap items-center px-2 py-1 gap-x-1 gap-y-0.5 select-none"
+        style={{ background: '#0d0d0d', borderBottom: '1px solid #3a3a3a' }}
+      >
+        <span className="text-xs mr-2" style={{ color: '#5a5a5a' }}>quick:</span>
+        {quickCmds.map((qc) => (
+          <button
+            key={qc}
+            onClick={(e) => { e.stopPropagation(); runCmd(qc); }}
+            className="text-xs px-2 font-mono"
+            style={{
+              background: 'transparent',
+              border: '1px solid #3a3a3a',
+              color: '#7aa2f7',
+              cursor: 'pointer',
+              padding: '0 6px',
+              height: '18px',
+              lineHeight: '18px',
+            }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#1a1a1a'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+          >
+            {qc}
+          </button>
+        ))}
+      </div>
 
-        {/* Command History Output */}
+      {/* Output area */}
+      <div className="px-3 pt-2 pb-24" style={{ maxWidth: '900px', margin: '0 auto' }}>
         {history.map((item) => (
-          <div key={item.id} className="mb-2">
+          <div key={item.id} className="mb-1">
             {item.type === 'input' ? (
-              <div className="flex flex-col sm:flex-row sm:items-center text-[#a9b1d6]">
-                <StarshipPrompt cwd={item.cwd || cwd} user={currentUser ? (currentUser.displayName?.toLowerCase().replace(/\s+/g, '') || 'guest') : 'guest'} />
-                <span className="font-normal whitespace-pre-wrap">{item.content}</span>
+              <div className="flex items-baseline flex-wrap">
+                <StarshipPrompt cwd={item.cwd || cwd} user={userLabel} />
+                <span className="text-sm" style={{ color: '#c8c8c8' }}>{item.content}</span>
               </div>
             ) : (
               <div>{item.content}</div>
             )}
           </div>
         ))}
-        
-        {/* Active Command Input Line */}
-        <div className="flex flex-col sm:flex-row sm:items-center mt-2">
-          <StarshipPrompt cwd={cwd} user={currentUser ? (currentUser.displayName?.toLowerCase().replace(/\s+/g, '') || 'guest') : 'guest'} />
+
+        {/* Active input line */}
+        <div className="flex items-baseline mt-1 flex-wrap">
+          <StarshipPrompt cwd={cwd} user={userLabel} />
           <input
             ref={inputRef}
             type="text"
-            className="flex-1 bg-transparent text-[#a9b1d6] outline-none border-none caret-[#9ece6a] shadow-none focus:ring-0 p-0 m-0 w-full font-mono text-sm sm:text-base"
+            className="flex-1 font-mono text-sm"
+            style={{
+              background: 'transparent',
+              color: '#c8c8c8',
+              outline: 'none',
+              border: 'none',
+              padding: 0,
+              margin: 0,
+              caretColor: '#9ece6a',
+              minWidth: '8ch',
+              width: '100%',
+            }}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             autoFocus
-            spellCheck="false"
+            spellCheck={false}
             autoComplete="off"
           />
         </div>
-        
-        <div ref={bottomRef} className="h-4" />
+
+        <div ref={bottomRef} style={{ height: '4px' }} />
       </div>
     </div>
   );

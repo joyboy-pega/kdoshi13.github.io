@@ -1,81 +1,66 @@
 import React from 'react';
 import { TILE_SIZE } from '../../data/mapData';
 
-const TILE_STYLES: Record<string, string> = {
-  'T': 'bg-[#24531e] shadow-[inset_0_2px_0_rgba(255,255,255,0.1)]', 
-  'G': 'bg-[#4e8d30]', 
-  'D': 'bg-[#c2a15c] shadow-[inset_0_1px_2px_rgba(0,0,0,0.1)]', 
-  'W': 'bg-[#316e9c] shadow-[inset_0_2px_0_rgba(255,255,255,0.2)]', 
-  'B': 'bg-[#8d6233] shadow-[inset_0_2px_0_rgba(0,0,0,0.25)] border-t border-[#5e3f1c]', 
-  'S': 'bg-[#4e8d30]', 
-  'E': 'bg-[#4e8d30]', 
-  'X': 'bg-[#4e8d30]', 
-  'P': 'bg-[#c2a15c]', 
-  'K': 'bg-[#4e8d30]', 
+// Flat color palette per tile type — no gradients
+const TILE_BG: Record<string, string> = {
+  T: '#1a3d16',   // dark tree green
+  G: '#2a5a1a',   // grass
+  D: '#6b4f28',   // dirt path
+  W: '#1a3a5c',   // water
+  B: '#5c3a14',   // bridge
+  S: '#2a5a1a',   // sage NPC on grass
+  E: '#2a5a1a',   // scroll NPC on grass
+  X: '#2a5a1a',   // blacksmith NPC
+  P: '#6b4f28',   // project chest on dirt
+  K: '#2a5a1a',   // skills target
 };
 
-// Clean SVG Renderers (No Emojis)
-const renderTileGraphic = (type: string) => {
-  switch (type) {
-    case 'T': // Tree
-      return (
-        <svg viewBox="0 0 24 24" className="w-6 h-6 text-[#1a3d16] fill-current">
-          <path d="M12 2L4 14h5v6h6v-6h5L12 2z" />
-        </svg>
-      );
-    case 'S': // Sage (Summary)
-      return (
-        <div className="w-6 h-6 rounded-full bg-[#7aa2f7] border-2 border-white flex items-center justify-center text-[10px] font-bold text-[#1a1b26] shadow-md">
-          S
-        </div>
-      );
-    case 'E': // Education (Scroll)
-      return (
-        <div className="w-6 h-6 rounded bg-[#e0af68] border border-[#563b14] flex items-center justify-center text-[10px] font-bold text-[#1a1b26] shadow-md">
-          EDU
-        </div>
-      );
-    case 'X': // Experience (Blacksmith)
-      return (
-        <div className="w-6 h-6 rounded-full bg-[#f7768e] border-2 border-white flex items-center justify-center text-[10px] font-bold text-white shadow-md">
-          EXP
-        </div>
-      );
-    case 'P': // Projects (Chest)
-      return (
-        <div className="w-6 h-5 rounded bg-[#e89d2d] border-2 border-[#5c3708] flex items-center justify-center text-[9px] font-extrabold text-[#1a1b26] shadow-md">
-          PRJ
-        </div>
-      );
-    case 'K': // Skills (Training)
-      return (
-        <div className="w-6 h-6 rounded-full bg-[#9ece6a] border-2 border-[#163a13] flex items-center justify-center text-[9px] font-bold text-[#163a13] shadow-md">
-          SKL
-        </div>
-      );
-    case 'W': // Water
-      return (
-        <div className="w-full h-full flex items-center justify-center opacity-30">
-          <div className="w-4 h-0.5 bg-white rounded" />
-        </div>
-      );
-    default:
-      return null;
-  }
+// ASCII representation of each special tile
+const TILE_CHAR: Record<string, string> = {
+  T: '#',  // tree as hash (dense)
+  S: 'S',
+  E: 'E',
+  X: 'X',
+  P: 'P',
+  K: 'K',
+  W: '~',
+  B: '=',
+};
+
+const TILE_FG: Record<string, string> = {
+  T: '#3a7a2a',
+  S: '#7aa2f7',
+  E: '#e0af68',
+  X: '#f7768e',
+  P: '#9ece6a',
+  K: '#bb9af7',
+  W: '#7dcfff',
+  B: '#c8a060',
 };
 
 export const Tile: React.FC<{ type: string; x: number; y: number }> = ({ type, x, y }) => {
+  const bg = TILE_BG[type] || '#2a5a1a';
+  const char = TILE_CHAR[type] || ' ';
+  const fg = TILE_FG[type] || '#c8c8c8';
+
   return (
-    <div 
-      className={`absolute select-none flex items-center justify-center ${TILE_STYLES[type] || 'bg-[#4e8d30]'}`}
+    <div
+      className="absolute flex items-center justify-center font-mono select-none"
       style={{
         width: TILE_SIZE,
         height: TILE_SIZE,
         left: x * TILE_SIZE,
         top: y * TILE_SIZE,
+        background: bg,
+        fontSize: TILE_SIZE * 0.5,
+        color: fg,
+        // Use ASCII border between tiles via box-shadow outline
+        outline: '1px solid rgba(0,0,0,0.15)',
+        outlineOffset: '-1px',
+        fontWeight: ['S','E','X','P','K'].includes(type) ? 'bold' : 'normal',
       }}
     >
-      {renderTileGraphic(type)}
+      {char}
     </div>
   );
 };

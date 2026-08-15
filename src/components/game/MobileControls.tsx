@@ -5,54 +5,62 @@ interface MobileControlsProps {
   onActionDown: () => void;
 }
 
+const btn = (label: string, onClick: () => void) => (
+  <button
+    aria-label={label}
+    onPointerDown={(e) => { e.preventDefault(); onClick(); }}
+    style={{
+      width: '48px',
+      height: '48px',
+      background: '#1a1a1a',
+      border: '1px solid #3a3a3a',
+      color: '#7aa2f7',
+      fontFamily: 'monospace',
+      fontSize: '14px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+    }}
+  >
+    {label}
+  </button>
+);
+
 export const MobileControls: React.FC<MobileControlsProps> = ({ onDirDown, onActionDown }) => {
   return (
-    <div className="fixed bottom-4 left-0 w-full px-6 flex justify-between items-end z-40 md:hidden select-none pointer-events-auto">
+    <div
+      className="fixed bottom-0 left-0 right-0 flex justify-between items-end px-4 pb-2 md:hidden select-none pointer-events-auto"
+      style={{ background: '#0d0d0d', borderTop: '1px solid #3a3a3a', zIndex: 40 }}
+    >
       {/* D-Pad */}
-      <div className="flex flex-col items-center gap-1 bg-[#1a1b26]/80 p-2 rounded-lg border border-[#414868]/60 shadow-xl">
-        <button 
-          aria-label="Up"
-          className="w-12 h-12 bg-[#2e344e] border-b-2 border-r-2 border-[#1a1b26] rounded flex items-center justify-center text-sm active:bg-[#414868] text-[#7aa2f7] font-bold shadow-md"
-          onPointerDown={(e) => { e.preventDefault(); onDirDown('w'); }}
-        >
-          UP
-        </button>
-        <div className="flex gap-1">
-          <button 
-            aria-label="Left"
-            className="w-12 h-12 bg-[#2e344e] border-b-2 border-r-2 border-[#1a1b26] rounded flex items-center justify-center text-sm active:bg-[#414868] text-[#7aa2f7] font-bold shadow-md"
-            onPointerDown={(e) => { e.preventDefault(); onDirDown('a'); }}
-          >
-            LEFT
-          </button>
-          <button 
-            aria-label="Down"
-            className="w-12 h-12 bg-[#2e344e] border-b-2 border-r-2 border-[#1a1b26] rounded flex items-center justify-center text-sm active:bg-[#414868] text-[#7aa2f7] font-bold shadow-md"
-            onPointerDown={(e) => { e.preventDefault(); onDirDown('s'); }}
-          >
-            DOWN
-          </button>
-          <button 
-            aria-label="Right"
-            className="w-12 h-12 bg-[#2e344e] border-b-2 border-r-2 border-[#1a1b26] rounded flex items-center justify-center text-sm active:bg-[#414868] text-[#7aa2f7] font-bold shadow-md"
-            onPointerDown={(e) => { e.preventDefault(); onDirDown('d'); }}
-          >
-            RIGHT
-          </button>
+      <div>
+        <div className="flex justify-center mb-0.5">
+          {btn('^', () => onDirDown('w'))}
+        </div>
+        <div className="flex">
+          {btn('<', () => onDirDown('a'))}
+          {btn('v', () => onDirDown('s'))}
+          {btn('>', () => onDirDown('d'))}
         </div>
       </div>
-      
-      {/* Action Button */}
-      <div className="flex flex-col items-center gap-1">
-        <button 
-          aria-label="Action / Interact"
-          className="w-16 h-16 bg-[#f7768e] border-b-2 border-[#c53b53] rounded-full flex flex-col items-center justify-center font-bold active:bg-[#c53b53] text-white shadow-2xl"
-          onPointerDown={(e) => { e.preventDefault(); onActionDown(); }}
-        >
-          <span className="text-base">ACT</span>
-          <span className="text-[9px] uppercase tracking-wider opacity-90">Talk</span>
-        </button>
-      </div>
+
+      {/* Action */}
+      <button
+        aria-label="Interact"
+        onPointerDown={(e) => { e.preventDefault(); onActionDown(); }}
+        style={{
+          width: '64px',
+          height: '64px',
+          background: '#264f78',
+          border: '1px solid #7aa2f7',
+          color: '#ffffff',
+          fontFamily: 'monospace',
+          fontSize: '13px',
+          fontWeight: 'bold',
+          cursor: 'pointer',
+        }}
+      >
+        ACT
+      </button>
     </div>
   );
 };

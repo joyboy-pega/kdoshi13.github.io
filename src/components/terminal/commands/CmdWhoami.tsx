@@ -5,21 +5,31 @@ interface CmdWhoamiProps {
   user?: any;
 }
 
-export const CmdWhoami: React.FC<CmdWhoamiProps> = ({ user }) => (
-  <div className="my-4 p-4 rounded-lg border border-[#292e42] bg-[#1f2335]/50 font-mono text-xs sm:text-sm">
-    <div className="text-[#7aa2f7] font-bold text-sm border-b border-[#292e42] pb-2 mb-3">
-      USER PROFILE: {contactInfo.name}
-    </div>
-    <div className="space-y-1.5 text-[#c0caf5]">
-      <div><span className="text-[#565f89]">Role:</span> {contactInfo.title}</div>
-      <div><span className="text-[#565f89]">Domain:</span> QA Engineering, Game Telemetry, Software Automation</div>
-      <div><span className="text-[#565f89]">Session:</span> {user ? `${user.displayName || user.email} (Authenticated)` : 'Guest User'}</div>
-      <div><span className="text-[#565f89]">Status:</span> Active (Open for Opportunities)</div>
-      <div className="mt-2 pt-2 border-t border-[#292e42]/60 text-[#9ece6a] italic">
-        "Ensuring software quality through telemetry and automation."
+export const CmdWhoami: React.FC<CmdWhoamiProps> = ({ user }) => {
+  const rows: [string, string, string?][] = [
+    ['Name',    contactInfo.name],
+    ['Role',    contactInfo.title],
+    ['Domain',  'QA Engineering  /  Game Telemetry  /  Automation'],
+    ['Session', user ? `${user.displayName || user.email}  [authenticated]` : 'guest  [unauthenticated]'],
+    ['Status',  'ACTIVE -- open for opportunities', '#9ece6a'],
+    ['Quote',   '"Ensuring software quality through telemetry & automation."', '#5a5a5a'],
+  ];
+
+  return (
+    <div className="font-mono text-sm my-2" style={{ color: '#c8c8c8' }}>
+      <div style={{ color: '#3a3a3a' }}>{'┌─[ USER PROFILE ]' + '─'.repeat(43) + '┐'}</div>
+      <div style={{ borderLeft: '1px solid #3a3a3a', borderRight: '1px solid #3a3a3a' }}>
+        {rows.map(([label, value, color]) => (
+          <div key={label} className="flex px-2 py-0" style={{ borderBottom: '1px solid #1e1e1e' }}>
+            <span style={{ color: '#5a5a5a', minWidth: '10ch', display: 'inline-block' }}>{label}</span>
+            <span style={{ color: '#3a3a3a', marginRight: '8px' }}>|</span>
+            <span style={{ color: color || '#c8c8c8' }}>{value}</span>
+          </div>
+        ))}
       </div>
+      <div style={{ color: '#3a3a3a' }}>{'└' + '─'.repeat(60) + '┘'}</div>
     </div>
-  </div>
-);
+  );
+};
 
 export default CmdWhoami;

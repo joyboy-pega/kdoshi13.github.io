@@ -1,29 +1,60 @@
 import React from 'react';
 
-interface CardProps {
-  title: string;
+// TUI box-drawing characters
+// Top:    ┌─┐
+// Mid:    │ │
+// Bottom: └─┘
+// With title: ┌─[ TITLE ]──┐
+
+interface TuiBoxProps {
+  title?: string;
   children: React.ReactNode;
-  borderColor?: string;
   titleColor?: string;
+  borderColor?: string;
+  className?: string;
 }
 
-export const AsciiBox: React.FC<CardProps> = ({ 
-  title, 
-  children, 
-  borderColor = '#292e42', 
-  titleColor = '#7aa2f7' 
-}) => (
-  <div className="w-full mb-4 font-mono text-sm sm:text-base rounded-lg border bg-[#1f2335]/60 overflow-hidden" style={{ borderColor }}>
-    <div className="px-3.5 py-1.5 bg-[#16161e] border-b flex items-center justify-between" style={{ borderColor }}>
-      <span className="font-bold text-xs uppercase tracking-wider" style={{ color: titleColor }}>
-        {title}
-      </span>
-      <span className="text-[10px] text-[#565f89]">system.out</span>
-    </div>
-    <div className="p-3.5">
-      {children}
-    </div>
-  </div>
-);
+export const TuiBox: React.FC<TuiBoxProps> = ({
+  title,
+  children,
+  titleColor = '#7aa2f7',
+  borderColor = '#3a3a3a',
+  className = '',
+}) => {
+  return (
+    <div className={`w-full font-mono text-sm ${className}`} style={{ color: '#c8c8c8' }}>
+      {/* Top border */}
+      <div className="flex items-center overflow-hidden whitespace-nowrap select-none" style={{ color: borderColor }}>
+        <span>&#x250C;</span>
+        {title ? (
+          <>
+            <span>&#x2500;</span>
+            <span style={{ color: titleColor }}>[ {title} ]</span>
+            <span className="flex-1 overflow-hidden" style={{ letterSpacing: 0 }}>
+              {'─'.repeat(120)}
+            </span>
+          </>
+        ) : (
+          <span className="flex-1 overflow-hidden">{'─'.repeat(120)}</span>
+        )}
+        <span>&#x2510;</span>
+      </div>
 
-export default AsciiBox;
+      {/* Content */}
+      <div className="px-3 py-2" style={{ borderLeft: `1px solid ${borderColor}`, borderRight: `1px solid ${borderColor}` }}>
+        {children}
+      </div>
+
+      {/* Bottom border */}
+      <div className="flex items-center overflow-hidden whitespace-nowrap select-none" style={{ color: borderColor }}>
+        <span>&#x2514;</span>
+        <span className="flex-1 overflow-hidden">{'─'.repeat(120)}</span>
+        <span>&#x2518;</span>
+      </div>
+    </div>
+  );
+};
+
+// Keep AsciiBox as alias for backward compat
+export const AsciiBox = TuiBox;
+export default TuiBox;

@@ -23,163 +23,141 @@ export const Game: React.FC<GameProps> = ({ onExitToTerminal }) => {
     let newDir = playerDir;
     let moved = false;
 
-    if (key === 'ArrowUp' || key === 'w' || key === 'W') { newDir = 'up'; y -= 1; moved = true; }
-    if (key === 'ArrowDown' || key === 's' || key === 'S') { newDir = 'down'; y += 1; moved = true; }
-    if (key === 'ArrowLeft' || key === 'a' || key === 'A') { newDir = 'left'; x -= 1; moved = true; }
+    if (key === 'ArrowUp'    || key === 'w' || key === 'W') { newDir = 'up';    y -= 1; moved = true; }
+    if (key === 'ArrowDown'  || key === 's' || key === 'S') { newDir = 'down';  y += 1; moved = true; }
+    if (key === 'ArrowLeft'  || key === 'a' || key === 'A') { newDir = 'left';  x -= 1; moved = true; }
     if (key === 'ArrowRight' || key === 'd' || key === 'D') { newDir = 'right'; x += 1; moved = true; }
 
     if (moved) {
       setPlayerDir(newDir);
       if (x >= 0 && x < MAP_WIDTH && y >= 0 && y < MAP_HEIGHT) {
-        const targetTile = GAME_MAP[y][x];
-        if (['G', 'D', 'B'].includes(targetTile)) {
-          setPlayerPos({ x, y });
-        }
+        const t = GAME_MAP[y][x];
+        if (['G', 'D', 'B'].includes(t)) setPlayerPos({ x, y });
       }
     }
 
     if (key === ' ' || key === 'Enter' || key === 'e' || key === 'E') {
-      let tx = playerPos.x;
-      let ty = playerPos.y;
-      if (playerDir === 'up') ty -= 1;
-      if (playerDir === 'down') ty += 1;
-      if (playerDir === 'left') tx -= 1;
+      let tx = playerPos.x, ty = playerPos.y;
+      if (playerDir === 'up')    ty -= 1;
+      if (playerDir === 'down')  ty += 1;
+      if (playerDir === 'left')  tx -= 1;
       if (playerDir === 'right') tx += 1;
-
       if (tx >= 0 && tx < MAP_WIDTH && ty >= 0 && ty < MAP_HEIGHT) {
-        const targetTile = GAME_MAP[ty][tx];
-        if (RESUME_CONTENT[targetTile]) {
-          setDialogContent(RESUME_CONTENT[targetTile]);
-        }
+        const t = GAME_MAP[ty][tx];
+        if (RESUME_CONTENT[t]) setDialogContent(RESUME_CONTENT[t]);
       }
     }
 
-    if (key === 'Escape' && onExitToTerminal) {
-      onExitToTerminal();
-    }
+    if (key === 'Escape' && onExitToTerminal) onExitToTerminal();
   }, [playerPos, playerDir, dialogContent, onExitToTerminal]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) {
-        e.preventDefault();
-      }
+    const onKey = (e: KeyboardEvent) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', ' '].includes(e.key)) e.preventDefault();
       handleInput(e.key);
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, [handleInput]);
 
+  // Proximity hint
   useEffect(() => {
-    const directions = [
-      { x: 0, y: -1 },
-      { x: 0, y: 1 },
-      { x: -1, y: 0 },
-      { x: 1, y: 0 }
-    ];
-
-    let foundHint: string | null = null;
-    for (const dir of directions) {
-      const nx = playerPos.x + dir.x;
-      const ny = playerPos.y + dir.y;
+    const dirs = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }];
+    let hint: string | null = null;
+    for (const d of dirs) {
+      const nx = playerPos.x + d.x, ny = playerPos.y + d.y;
       if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT) {
-        const tile = GAME_MAP[ny][nx];
-        if (RESUME_CONTENT[tile]) {
-          foundHint = `Press [SPACE] to inspect ${RESUME_CONTENT[tile].title}`;
-          break;
-        }
+        const t = GAME_MAP[ny][nx];
+        if (RESUME_CONTENT[t]) { hint = `[Space] -- ${RESUME_CONTENT[t].title}`; break; }
       }
     }
-    setActiveHint(foundHint);
+    setActiveHint(hint);
   }, [playerPos]);
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center p-2 sm:p-4 select-none font-mono">
-      
-      {/* Top Game Bar */}
-      <div className="w-full max-w-2xl flex items-center justify-between mb-3 px-2 text-xs sm:text-sm">
-        <div className="flex items-center gap-2 text-[#9ece6a] bg-[#1a1b26]/80 px-3 py-1.5 rounded border border-[#414868]">
-          <span className="font-bold">Keval's Legend (RPG Mode)</span>
-        </div>
+    <div
+      className="flex-1 flex flex-col items-center font-mono select-none"
+      style={{ background: '#0d0d0d', color: '#c8c8c8' }}
+    >
+      {/* Top bar */}
+      <div
+        className="w-full flex items-center justify-between px-2 text-xs"
+        style={{ background: '#0d0d0d', borderBottom: '1px solid #3a3a3a', height: '22px' }}
+      >
+        <span style={{ color: '#9ece6a' }}>[ GAME MODE ] keval's legend</span>
         {onExitToTerminal && (
-          <button 
+          <button
             onClick={onExitToTerminal}
-            className="flex items-center gap-1.5 bg-[#24283b] hover:bg-[#414868] text-[#7aa2f7] hover:text-white px-3 py-1.5 rounded border border-[#414868] transition-all font-semibold"
+            style={{ background: 'transparent', border: '1px solid #3a3a3a', color: '#7aa2f7', cursor: 'pointer', fontFamily: 'monospace', fontSize: '11px', padding: '0 8px', height: '18px' }}
           >
-            <span>[Back to Terminal]</span>
-            <span className="text-[10px] text-[#565f89] hidden sm:inline">[ESC]</span>
+            [Esc] back to terminal
           </button>
         )}
       </div>
 
-      {/* Game Viewport Canvas */}
-      <div 
-        className="relative bg-[#4e8d30] shadow-[0_0_0_4px_#24283b,0_0_0_8px_#414868,0_20px_50px_rgba(0,0,0,0.8)] rounded-lg overflow-hidden max-w-full"
-        style={{
-          width: MAP_WIDTH * TILE_SIZE,
-          height: MAP_HEIGHT * TILE_SIZE,
-        }}
-      >
-        {GAME_MAP.map((row, y) => 
-          row.map((tile, x) => (
-            <Tile key={`${x}-${y}`} type={tile} x={x} y={y} />
-          ))
-        )}
+      {/* Game canvas */}
+      <div className="flex-1 flex flex-col items-center justify-center py-2">
+        <div
+          className="relative overflow-hidden"
+          style={{
+            width: MAP_WIDTH * TILE_SIZE,
+            height: MAP_HEIGHT * TILE_SIZE,
+            outline: '2px solid #7aa2f7',
+            outlineOffset: '0px',
+          }}
+        >
+          {GAME_MAP.map((row, y) =>
+            row.map((tile, x) => <Tile key={`${x}-${y}`} type={tile} x={x} y={y} />)
+          )}
+          <Player x={playerPos.x} y={playerPos.y} dir={playerDir} />
 
-        <Player x={playerPos.x} y={playerPos.y} dir={playerDir} />
+          {/* Overlay hint: HUD */}
+          {!dialogContent && (
+            <div
+              className="absolute top-0 left-0 text-xs px-2 py-1"
+              style={{ background: '#0d0d0dcc', borderRight: '1px solid #3a3a3a', borderBottom: '1px solid #3a3a3a', color: '#7aa2f7' }}
+            >
+              <div>WASD / arrows: move</div>
+              <div>Space / Enter: interact</div>
+            </div>
+          )}
 
-        {/* Legend / Overlay banner */}
-        {!dialogContent && (
-          <div className="absolute top-2 left-2 text-[#f8f8f8] bg-[#1a1b26]/90 border border-[#414868] p-2 rounded flex flex-col gap-0.5 text-xs shadow-md">
-            <span className="font-bold text-[#7dcfff]">
-              WASD / Arrow Keys: Move
+          {/* Proximity interact hint */}
+          {activeHint && !dialogContent && (
+            <div
+              className="absolute bottom-0 left-0 right-0 text-xs px-2 py-1 text-center"
+              style={{ background: '#264f78', borderTop: '1px solid #7aa2f7', color: '#ffffff' }}
+            >
+              {activeHint}
+            </div>
+          )}
+
+          {dialogContent && (
+            <Dialog content={dialogContent} onClose={() => setDialogContent(null)} />
+          )}
+        </div>
+
+        {/* Legend row */}
+        <div
+          className="flex flex-wrap gap-x-4 gap-y-0.5 px-2 py-1 text-xs"
+          style={{ borderTop: '1px solid #3a3a3a', width: MAP_WIDTH * TILE_SIZE, background: '#0d0d0d', color: '#5a5a5a' }}
+        >
+          {[
+            ['S', '#7aa2f7',  'Summary'],
+            ['X', '#f7768e',  'Experience'],
+            ['P', '#9ece6a',  'Projects'],
+            ['K', '#bb9af7',  'Skills'],
+            ['E', '#e0af68',  'Education'],
+          ].map(([char, color, label]) => (
+            <span key={char}>
+              <span style={{ color: color as string, fontWeight: 'bold' }}>{char}</span>
+              {` = ${label}`}
             </span>
-            <span className="text-[#a9b1d6]">
-              Space / Enter: Interact
-            </span>
-          </div>
-        )}
-
-        {/* Proximity Interaction Hint */}
-        {activeHint && !dialogContent && (
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-[#7aa2f7] text-[#1a1b26] font-bold px-3 py-1 rounded-full text-xs shadow-lg animate-bounce z-30">
-            {activeHint}
-          </div>
-        )}
-
-        {/* Dialog Modal */}
-        {dialogContent && (
-          <Dialog 
-            content={dialogContent} 
-            onClose={() => setDialogContent(null)} 
-          />
-        )}
+          ))}
+        </div>
       </div>
 
-      {/* Touch / Mobile Controls */}
-      <MobileControls 
-        onDirDown={(key) => handleInput(key)} 
-        onActionDown={() => handleInput(' ')} 
-      />
-
-      {/* Bottom Quick Legend */}
-      <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#a9b1d6]">
-        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#7aa2f7]" /> [S] Summary
-        </span>
-        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#f7768e]" /> [EXP] Experience
-        </span>
-        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
-          <span className="w-2.5 h-2.5 rounded bg-[#e89d2d]" /> [PRJ] Projects
-        </span>
-        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#9ece6a]" /> [SKL] Skills
-        </span>
-        <span className="flex items-center gap-1.5 bg-[#1f2335] px-2.5 py-1 rounded border border-[#292e42]">
-          <span className="w-2.5 h-2.5 rounded bg-[#e0af68]" /> [EDU] Education
-        </span>
-      </div>
+      <MobileControls onDirDown={(k) => handleInput(k)} onActionDown={() => handleInput(' ')} />
     </div>
   );
 };

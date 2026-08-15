@@ -1,29 +1,31 @@
 import React from 'react';
-import { AsciiBox } from '../../common/AsciiBox';
 import { skills } from '../../../data/portfolioData';
 
-export const CmdSkills: React.FC = () => (
-  <div className="my-4 font-mono text-sm sm:text-base">
-    <div className="mb-3 text-[#7aa2f7] font-bold">
-      [ TECHNICAL PROFICIENCIES & QA DOMAINS ]
+export const CmdSkills: React.FC = () => {
+  return (
+    <div className="font-mono text-sm my-2" style={{ color: '#c8c8c8' }}>
+      <div style={{ color: '#3a3a3a' }}>{'┌─[ SKILLS.YML ]' + '─'.repeat(44) + '┐'}</div>
+      <div style={{ borderLeft: '1px solid #3a3a3a', borderRight: '1px solid #3a3a3a' }}>
+        {Object.entries(skills).map(([category, items], idx) => (
+          <React.Fragment key={category}>
+            {/* Category header */}
+            <div className="px-2 py-0.5" style={{ background: '#1a1a1a', borderBottom: '1px solid #3a3a3a', color: '#bb9af7' }}>
+              {category}:
+            </div>
+            {/* Skill items */}
+            <div className="px-2 py-0.5 flex flex-wrap" style={{ borderBottom: idx < Object.keys(skills).length - 1 ? '1px solid #3a3a3a' : 'none', gap: '4px 16px' }}>
+              {items.map((skill, i) => (
+                <span key={i} style={{ color: '#7dcfff' }}>
+                  - {skill}
+                </span>
+              ))}
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+      <div style={{ color: '#3a3a3a' }}>{'└' + '─'.repeat(60) + '┘'}</div>
     </div>
-    <div className="grid sm:grid-cols-2 gap-4">
-      {Object.entries(skills).map(([category, items], idx) => (
-        <AsciiBox key={idx} title={category.toUpperCase()} borderColor="#414868" titleColor="#bb9af7">
-          <div className="flex flex-wrap gap-2">
-            {items.map((skill, i) => (
-              <span 
-                key={i} 
-                className="text-[#7dcfff] bg-[#24283b] border border-[#3b4261] px-2 py-0.5 rounded text-xs sm:text-sm font-medium hover:border-[#7aa2f7] transition-colors"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-        </AsciiBox>
-      ))}
-    </div>
-  </div>
-);
+  );
+};
 
 export default CmdSkills;
